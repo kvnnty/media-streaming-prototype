@@ -1,0 +1,24 @@
+-- users table
+CREATE TABLE IF NOT EXISTS users (
+  id SERIAL PRIMARY KEY,
+  username TEXT UNIQUE NOT NULL,
+  password TEXT NOT NULL
+);
+
+-- streams table
+CREATE TABLE IF NOT EXISTS streams (
+  id SERIAL PRIMARY KEY,
+  stream_key TEXT UNIQUE NOT NULL,
+  user_id INTEGER REFERENCES users(id),
+  title TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  active BOOLEAN DEFAULT TRUE
+);
+
+-- videos table
+CREATE TABLE IF NOT EXISTS videos (
+  id SERIAL PRIMARY KEY,
+  path TEXT NOT NULL,
+  title TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
