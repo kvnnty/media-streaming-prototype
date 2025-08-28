@@ -1,3 +1,4 @@
+```
 -- users table
 CREATE TABLE IF NOT EXISTS users (
   id SERIAL PRIMARY KEY,
@@ -22,3 +23,5 @@ CREATE TABLE IF NOT EXISTS videos (
   title TEXT NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+```
