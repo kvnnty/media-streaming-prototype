@@ -28,14 +28,14 @@ services:
     restart: unless-stopped
 
   web_service:
-    build: ./web_server
-    container_name: web_server
+    build: ./web
+    container_name: web
     env_file:
-      - ./web_server/.env
+      - ./web/.env
     ports:
       - "3000:3000"      # serve web frontend on port 8080
     volumes:
-      - ./web_server:/usr/src/app
+      - ./web:/usr/src/app
     depends_on:
       - api_service
       - media_streaming_service
