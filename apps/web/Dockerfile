@@ -1,17 +1,17 @@
-FROM node:22-alpine
+FROM node:22-slim
 
 WORKDIR /usr/src/app
 
-ENV NODE_ENV=production
+RUN npm install -g pnpm
 
-COPY package.json ./
+COPY package.json pnpm-lock.yaml* ./
 
-RUN npm install --production
+RUN pnpm install --frozen-lockfile
 
 COPY . .
 
-RUN npm run build
+RUN pnpm build
 
 EXPOSE 3000
 
-CMD ["npm", "start"]
+CMD ["pnpm", "start"]

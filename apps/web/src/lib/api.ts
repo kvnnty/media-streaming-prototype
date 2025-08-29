@@ -21,6 +21,18 @@ export const getStreams = async () => {
   return res.data;
 };
 
+export const startStream = async (title: string) => {
+  const token = getToken();
+  const res = await axios.post(
+    `${API_BASE}/streams`,
+    { title },
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return res.data;
+};
+
 export const getVODs = async () => {
   const res = await axios.get(`${API_BASE}/videos`);
   return res.data;

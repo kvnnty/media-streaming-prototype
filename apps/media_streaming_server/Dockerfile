@@ -1,16 +1,17 @@
 FROM node:22-alpine
 
-RUN apt-get update && apt-get install -y ffmpeg curl && rm -rf /var/lib/apt/lists/*
+# Install ffmpeg and curl
+RUN apk add --no-cache ffmpeg curl
 
 WORKDIR /usr/src/app
 
-COPY package.json ./
+COPY package.json package-lock.json* ./
 
 RUN npm install --production
 
 COPY . .
 
-# create folders
+# Create folders for HLS segments and recordings
 RUN mkdir -p ./hls ./recordings
 
 EXPOSE 1935 8000
