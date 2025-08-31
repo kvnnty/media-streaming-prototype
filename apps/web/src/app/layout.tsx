@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import Provider from "@/components/Provider";
 
 export const metadata: Metadata = {
   title: "Media streaming services demo",
@@ -13,7 +14,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">
+        <Provider>{children}</Provider>
+      </body>
     </html>
   );
 }

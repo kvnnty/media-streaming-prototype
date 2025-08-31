@@ -8,11 +8,14 @@
     "start": "next start"
   },
   "dependencies": {
+    "@types/simple-peer": "^9.11.8",
     "axios": "^1.11.0",
     "hls.js": "^1.6.11",
     "next": "15.5.2",
+    "next13-progressbar": "^1.2.2",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "simple-peer": "^9.11.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

@@ -1,20 +1,20 @@
 import axios from "axios";
-import { getToken } from "./auth-store";
+import { getAuth } from "./auth-store";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
 export const login = async (username: string, password: string) => {
   const res = await axios.post(`${API_BASE}/auth/login`, { username, password });
-  return res.data.token;
+  return res.data;
 };
 
-export const register = async (username: string, password: string) => {
-  const res = await axios.post(`${API_BASE}/auth/register`, { username, password });
-  return res.data.token;
+export const register = async (username: string, password: string, role: string) => {
+  const res = await axios.post(`${API_BASE}/auth/register`, { username, password, role });
+  return res.data;
 };
 
 export const getStreams = async () => {
-  const token = getToken();
+  const { token } = getAuth();
   const res = await axios.get(`${API_BASE}/streams`, {
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -22,7 +22,7 @@ export const getStreams = async () => {
 };
 
 export const startStream = async (title: string) => {
-  const token = getToken();
+  const { token } = getAuth();
   const res = await axios.post(
     `${API_BASE}/streams`,
     { title },
@@ -34,6 +34,9 @@ export const startStream = async (title: string) => {
 };
 
 export const getVODs = async () => {
-  const res = await axios.get(`${API_BASE}/videos`);
+  const { token } = getAuth();
+  const res = await axios.get(`${API_BASE}/videos`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
   return res.data;
 };

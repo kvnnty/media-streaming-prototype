@@ -1,6 +1,6 @@
 "use client";
 import { login } from "@/lib/api";
-import { saveToken } from "@/lib/auth-store";
+import { saveAuth } from "@/lib/auth-store";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -14,8 +14,8 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const token = await login(username, password);
-      saveToken(token);
+      const res = await login(username, password);
+      saveAuth(res.token, res.user);
       router.push("/live");
     } catch (err: any) {
       setError(err.response.data.message);
