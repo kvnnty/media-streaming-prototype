@@ -14,8 +14,10 @@
   "dependencies": {
     "@types/node-media-server": "^2.3.7",
     "axios": "^1.11.0",
+    "dotenv": "^17.2.1",
     "node-media-server": "^4.0.21",
-    "ts-node": "^10.9.2"
+    "ts-node": "^10.9.2",
+    "tslog": "^4.9.3"
   },
   "devDependencies": {
     "@types/node": "^24.3.0",

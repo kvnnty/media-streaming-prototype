@@ -8,10 +8,10 @@ const router = Router();
 const JWT_SECRET = process.env.JWT_SECRET as string;
 
 router.post("/register", async (req, res) => {
-  const { username, password } = req.body;
+  const { username, password, role } = req.body;
 
-  if (!username || !password) {
-    return res.status(400).json({ message: "username & password are required" });
+  if (!username || !password || !role) {
+    return res.status(400).json({ message: "username, password and role are required" });
   }
 
   try {
@@ -22,7 +22,7 @@ router.post("/register", async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const result = await query("INSERT INTO users (username, password) VALUES ($1, $2) RETURNING id, username", [username, hashedPassword]);
+    const result = await query("INSERT INTO users (username, password, role) VALUES ($1, $2, $3) RETURNING id, username, role", [username, hashedPassword, role]);
 
     res.status(201).json({ user: result.rows[0] });
   } catch (err) {
@@ -39,8 +39,8 @@ router.post("/login", async (req, res) => {
     if (!user || !bcrypt.compareSync(password, user.password)) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
-    const token = jwt.sign({ sub: user.id, username: user.username }, JWT_SECRET, { expiresIn: "12h" });
-    res.json({ token });
+    const token = jwt.sign({ sub: user.id, username: user.username, role: user.role }, JWT_SECRET, { expiresIn: "12h" });
+    res.json({ token, user });
   } catch (err) {
     console.error("Login error:", err);
     res.status(500).json({ message: "Internal server error" });

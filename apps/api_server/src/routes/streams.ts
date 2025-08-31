@@ -13,7 +13,7 @@ router.post("/", requireAuth, async (req: AuthRequest, res) => {
 });
 
 router.get("/", requireAuth, async (req: AuthRequest, res) => {
-  const result = await query("SELECT id, stream_key, title, created_at, active FROM streams WHERE user_id=$1", [req.user!.sub]);
+  const result = await query("SELECT id, stream_key, title, created_at, active FROM streams");
   res.json(result.rows);
 });
 

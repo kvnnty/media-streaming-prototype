@@ -1,14 +1,25 @@
+import dotenv from "dotenv";
 import NodeMediaServer from "node-media-server";
-import axios from "axios";
+import path from "path";
 
-const API_URL = process.env.API_URL;
-if (!API_URL) throw new Error("API_URL env required");
+dotenv.config();
 
-const FFMPEG_PATH = process.env.FFMPEG_PATH || "/usr/bin/ffmpeg";
+const FFMPEG_PATH = process.env.FFMPEG_PATH;
+if (!FFMPEG_PATH) throw new Error("FFMPEG_PATH env required");
 
 const config = {
-  rtmp: { port: 1935, chunk_size: 60000, gop_cache: true, ping: 30, ping_timeout: 60 },
-  http: { port: 8000, mediaroot: "./hls", allow_origin: "*" },
+  rtmp: {
+    port: 1935,
+    chunk_size: 60000,
+    gop_cache: true,
+    ping: 30,
+    ping_timeout: 60,
+  },
+  http: {
+    port: 8081,
+    mediaroot: path.join(__dirname, "hls"),
+    allow_origin: "*",
+  },
   trans: {
     ffmpeg: FFMPEG_PATH,
     tasks: [
@@ -18,41 +29,29 @@ const config = {
         hls: true,
         hlsFlags: "[hls_time=4:hls_list_size=5:hls_flags=delete_segments]",
         dash: false,
-        mp4: true,
-        mp4Flags: "[movflags=+faststart]",
       },
     ],
+  },
+  webrtc: {
+    port: 8888,
+    ssl: false,
   },
 };
 
 const nms = new NodeMediaServer(config);
 
-nms.on("prePublish", async (id, StreamPath) => {
-  
-  // StreamPath from frontend looks like: /live/{streamKey}
-  const parts = StreamPath.split("/");
-  const streamKey = parts[parts.length - 1];
-
-  try {
-    const res = await axios.get(`${API_URL}/verify-stream/${streamKey}`, { timeout: 3000 });
-    if (!res.data?.ok) {
-      const session = nms.getSession(id);
-      // session?.reject();
-      console.log("Publish rejected", streamKey, "reason:", res.data?.reason);
-    } else {
-      console.log("Publish allowed", streamKey);
-    }
-  } catch (err: any) {
-    console.error("Verify stream error", err.message);
-    // nms.getSession(id)?.reject();
-  }
+nms.on("prePublish", (id, streamPath) => {
+  console.log(`[prePublish] Stream starting: ${streamPath}`);
 });
 
-nms.on("postPublish", (id, StreamPath) => console.log("postPublish", id, StreamPath));
+nms.on("postPublish", (id, streamPath) => {
+  console.log(`[postPublish] Stream active: ${streamPath}`);
+});
 
-nms.on("donePublish", (id, StreamPath) => {
-  console.log("donePublish", id, StreamPath);
-  // Detect the mp4 file in recordings and call API to register VOD
+nms.on("donePublish", (id, streamPath) => {
+  console.log(`[donePublish] Stream ended: ${streamPath}`);
 });
 
 nms.run();
+
+console.log("Broadcast server running...");
