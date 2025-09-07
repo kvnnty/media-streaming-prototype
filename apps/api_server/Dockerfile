@@ -10,4 +10,4 @@ COPY . .
 
 RUN pnpm run build
 
-CMD ["node", "dist/server.js"]
+CMD ["pnpm", "start"]

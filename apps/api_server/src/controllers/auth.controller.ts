@@ -1,0 +1,76 @@
+import bcrypt from "bcrypt";
+import { Request, Response } from "express";
+import jwt from "jsonwebtoken";
+import pool from "../models/db";
+
+export class AuthController {
+  static async register(req: Request, res: Response) {
+    try {
+      const { username, email, password } = req.body;
+
+      if (!username || !email || !password) {
+        return res.status(400).json({ error: "All fields are required" });
+      }
+
+      // Check if user exists
+      const existingUser = await pool.query("SELECT id FROM users WHERE email = $1 OR username = $2", [email, username]);
+
+      if (existingUser.rows.length > 0) {
+        return res.status(400).json({ error: "User already exists" });
+      }
+
+      // Hash password
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      // Create user
+      const result = await pool.query("INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING id, username, email", [
+        username,
+        email,
+        hashedPassword,
+      ]);
+
+      const user = result.rows[0];
+      const token = jwt.sign({ id: user.id, username: user.username }, process.env.JWT_SECRET as string, { expiresIn: "24h" });
+
+      res.status(201).json({ token, user });
+    } catch (error) {
+      console.error("Registration error:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  }
+
+  static async login(req: Request, res: Response) {
+    try {
+      const { email, password } = req.body;
+
+      if (!email || !password) {
+        return res.status(400).json({ error: "Email and password are required" });
+      }
+
+      // Find user
+      const result = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
+
+      if (result.rows.length === 0) {
+        return res.status(400).json({ error: "Invalid credentials" });
+      }
+
+      const user = result.rows[0];
+
+      // Check password
+      const isValidPassword = await bcrypt.compare(password, user.password);
+      if (!isValidPassword) {
+        return res.status(400).json({ error: "Invalid credentials" });
+      }
+
+      const token = jwt.sign({ id: user.id, username: user.username }, process.env.JWT_SECRET as string, { expiresIn: "24h" });
+
+      res.json({
+        token,
+        user: { id: user.id, username: user.username, email: user.email },
+      });
+    } catch (error) {
+      console.error("Login error:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  }
+}

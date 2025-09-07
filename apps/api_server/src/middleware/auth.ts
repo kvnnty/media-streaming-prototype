@@ -1,28 +1,24 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import { JWTPayload } from "../types";
-
-const JWT_SECRET = process.env.JWT_SECRET;
-if (!JWT_SECRET) {
-  throw new Error("❌ JWT_SECRET is required in environment variables");
-}
+import { User } from "../types";
 
 export interface AuthRequest extends Request {
-  user?: JWTPayload;
+  user?: User;
 }
 
-export function requireAuth(req: AuthRequest, res: Response, next: NextFunction): void {
-  const header = req.headers.authorization;
-  if (!header) {
-    res.status(401).json({ message: "Missing token" });
-    return;
+export const requireAuth = (req: AuthRequest, res: Response, next: NextFunction) => {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+
+  if (!token) {
+    return res.status(401).json({ error: "Access token required" });
   }
-  const token = header.split(" ")[1];
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET!) as any;
-    req.user = decoded;
+
+  jwt.verify(token, process.env.JWT_SECRET as string, (err: any, user: any) => {
+    if (err) {
+      return res.status(403).json({ error: "Invalid token" });
+    }
+    req.user = user;
     next();
-  } catch {
-    res.status(401).json({ message: "Invalid token" });
-  }
-}
+  });
+};
