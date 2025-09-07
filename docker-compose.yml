@@ -9,34 +9,51 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./apps/api_server:/usr/src/app  # Remove for prod
-    restart: unless-stopped
-
-  media_streaming_service:
-    build: ./apps/media_streaming_server
-    container_name: media_streaming_server
-    env_file:
-      - ./apps/media_streaming_server/.env
-    ports:
-      - "1935:1935"    # RTMP ingest
-      - "8000:8000"    # HLS playback
-    volumes:
-      - ./apps/media_streaming_server/hls:/usr/src/app/hls
-      - ./apps/media_streaming_server/recordings:/usr/src/app/recordings
+      - ./apps/api_server:/usr/src/app
     depends_on:
-      - api_service
+      - db
     restart: unless-stopped
 
   web_service:
     build: ./apps/web
-    container_name: web
+    container_name: web_service
     env_file:
       - ./apps/web/.env
     ports:
       - "3000:3000"
     volumes:
-      - ./apps/web:/usr/src/app  # Remove for prod
+      - ./apps/web:/usr/src/app
     depends_on:
       - api_service
-      - media_streaming_service
+      - nginx_rtmp_service
     restart: unless-stopped
+
+  nginx_rtmp_service:
+    build: ./apps/nginx_rtmp_server
+    container_name: nginx_rtmp_server
+    ports:
+      - "1935:1935"
+      - "8081:8080"
+    volumes:
+      - ./apps/nginx_rtmp_server/hls:/hls/live
+      - ./apps/nginx_rtmp_server/vod:/vod
+    depends_on:
+      - api_service
+    restart: unless-stopped
+
+  db:
+    image: postgres:15
+    container_name: media_streaming_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secure@123
+      POSTGRES_DB: media_streaming_demo
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+
+volumes:
+  pg_data:

@@ -9,7 +9,7 @@ export default function LiveStreamPage({ params }: { params: Promise<{ streamkey
   const { streamkey } = use(params);
   const { user } = getAuth();
 
-  const url = `http://localhost:8081/live/${streamkey}/index.m3u8`;
+  const url = `http://localhost:8081/${streamkey}/index.m3u8`;
 
   return (
     <>
