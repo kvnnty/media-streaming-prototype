@@ -1,11 +1,13 @@
 {
-  "name": "api-server",
+  "name": "media-streaming-api-server",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "tsc",
     "start": "tsc && node dist/server.js",
     "dev": "nodemon --exec ts-node src/server.ts",
+    "db:migrate": "./scripts/setup.sh",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -13,16 +15,16 @@
   "license": "ISC",
   "packageManager": "pnpm@10.14.0",
   "dependencies": {
-    "@types/node-media-server": "^2.3.7",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
     "express": "^4.18.2",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.0",
-    "node-media-server": "^4.0.21",
+    "multer": "^2.0.2",
     "nodemon": "^3.1.10",
     "pg": "^8.16.3",
+    "socket.io": "^4.8.1",
     "ts-node": "^10.9.2",
     "uuid": "^9.0.0"
   },
@@ -31,6 +33,7 @@
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/jsonwebtoken": "^9.0.10",
+    "@types/multer": "^2.0.0",
     "@types/node": "^24.3.0",
     "@types/pg": "^8.15.5",
     "@types/uuid": "^10.0.0",
