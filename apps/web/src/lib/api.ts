@@ -95,9 +95,10 @@ class ApiClient {
     return this.request<Stream>(`/streams/${id}`);
   }
 
-  async endStream(id: string): Promise<Stream> {
-    return this.request<Stream>(`/streams/${id}/end`, {
+  async endStream(key: string): Promise<Stream> {
+    return this.request<Stream>(`/streams/end`, {
       method: "POST",
+      body: JSON.stringify({ name: key }),
     });
   }
 

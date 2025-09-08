@@ -1,48 +1,48 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useEffect, useState } from "react"
-import { Header } from "@/components/header"
-import { StreamCard } from "@/components/stream-card"
-import { VideoCard } from "@/components/video-card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { api, type Stream, type Video } from "@/lib/api"
-import { useAuth } from "@/hooks/use-auth"
-import { Search, Zap, Users, VideoIcon } from "lucide-react"
-import Link from "next/link"
+import { useEffect, useState } from "react";
+import { Header } from "@/components/header";
+import { StreamCard } from "@/components/stream-card";
+import { VideoCard } from "@/components/video-card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { api, type Stream, type Video } from "@/lib/api";
+import { useAuth } from "@/hooks/use-auth";
+import { Search, Zap, Users, VideoIcon } from "lucide-react";
+import Link from "next/link";
 
 export default function HomePage() {
-  const [liveStreams, setLiveStreams] = useState<Stream[]>([])
-  const [recentVideos, setRecentVideos] = useState<Video[]>([])
-  const [searchQuery, setSearchQuery] = useState("")
-  const [loading, setLoading] = useState(true)
-  const { user } = useAuth()
+  const [liveStreams, setLiveStreams] = useState<Stream[]>([]);
+  const [recentVideos, setRecentVideos] = useState<Video[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [streams, videos] = await Promise.all([api.getLiveStreams(), api.getVideos()])
-        setLiveStreams(streams)
-        setRecentVideos(videos.slice(0, 8)) // Show first 8 videos
+        const [streams, videos] = await Promise.all([api.getLiveStreams(), api.getVideos()]);
+        setLiveStreams(streams);
+        setRecentVideos(videos.slice(0, 8)); // Show first 8 videos
       } catch (error) {
-        console.error("Failed to fetch data:", error)
+        console.error("Failed to fetch data:", error);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchData()
-  }, [])
+    fetchData();
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (searchQuery.trim()) {
       // Navigate to search results or filter content
-      console.log("Search for:", searchQuery)
+      console.log("Search for:", searchQuery);
     }
-  }
+  };
 
   if (loading) {
     return (
@@ -57,7 +57,7 @@ export default function HomePage() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -68,7 +68,7 @@ export default function HomePage() {
       <section className="bg-gradient-to-r from-primary/10 to-secondary/10 py-16">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-6xl font-bold text-balance mb-6">
-            Welcome to <span className="text-primary">StreamHub</span>
+            Welcome to <span className="text-primary">TV1 Prime</span>
           </h1>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto text-pretty">
             Discover amazing live streams, connect with creators, and share your passion with the world.
@@ -172,5 +172,5 @@ export default function HomePage() {
         </section>
       </div>
     </div>
-  )
+  );
 }

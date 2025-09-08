@@ -1,45 +1,47 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useEffect, useRef } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { useAuth } from "@/hooks/use-auth"
-import { useChat } from "@/hooks/use-chat"
-import { Send, Users, Wifi, WifiOff, MessageCircle } from "lucide-react"
+import { useState, useEffect, useRef } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/hooks/use-auth";
+import { useChat } from "@/hooks/use-chat";
+import { Send, Users, Wifi, WifiOff, MessageCircle } from "lucide-react";
+import { Stream } from "@/lib/api";
 
 interface ChatProps {
-  streamId: string
-  className?: string
+  stream: Stream;
+  isStreamEnded?: boolean;
+  className?: string;
 }
 
-export function Chat({ streamId, className = "" }: ChatProps) {
-  const [newMessage, setNewMessage] = useState("")
-  const { user } = useAuth()
-  const { messages, viewerCount, isLoading, isConnected, sendMessage } = useChat(streamId)
-  const messagesEndRef = useRef<HTMLDivElement>(null)
-  const scrollAreaRef = useRef<HTMLDivElement>(null)
+export function Chat({ stream, className = "" }: ChatProps) {
+  const [newMessage, setNewMessage] = useState("");
+  const { user } = useAuth();
+  const { messages, viewerCount, isLoading, isConnected, sendMessage } = useChat(stream.id.toString());
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Auto-scroll to bottom when new messages arrive
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [messages])
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   const handleSendMessage = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!newMessage.trim()) return
+    e.preventDefault();
+    if (!newMessage.trim()) return;
 
-    sendMessage(newMessage)
-    setNewMessage("")
-  }
+    sendMessage(newMessage);
+    setNewMessage("");
+  };
 
   const formatTime = (date: Date) => {
-    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-  }
+    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  };
 
   return (
     <div className={`flex flex-col h-full bg-card border border-border rounded-lg ${className}`}>
@@ -91,9 +93,7 @@ export function Chat({ streamId, className = "" }: ChatProps) {
               messages.map((message) => (
                 <div key={message.id} className="flex items-start space-x-3">
                   <Avatar className="w-6 h-6 flex-shrink-0">
-                    <AvatarFallback className="bg-primary text-primary-foreground text-xs">
-                      {message.username.charAt(0).toUpperCase()}
-                    </AvatarFallback>
+                    <AvatarFallback className="bg-primary text-primary-foreground text-xs">{message.username.charAt(0).toUpperCase()}</AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-baseline space-x-2">
@@ -112,7 +112,11 @@ export function Chat({ streamId, className = "" }: ChatProps) {
 
       {/* Message input */}
       <div className="p-4 border-t border-border">
-        {user ? (
+        {stream.actual_end && new Date(stream.actual_end).getTime() < Date.now() ? (
+          <div className="text-center text-sm text-muted-foreground">
+            <p>Stream ended!</p>
+          </div>
+        ) : user ? (
           <form onSubmit={handleSendMessage} className="flex space-x-2">
             <Input
               value={newMessage}
@@ -133,5 +137,5 @@ export function Chat({ streamId, className = "" }: ChatProps) {
         )}
       </div>
     </div>
-  )
+  );
 }

@@ -13,6 +13,7 @@ import { api, type Stream } from "@/lib/api";
 import { useAuth } from "@/hooks/use-auth";
 import { Calendar, Users, Heart, Share2, Flag } from "lucide-react";
 import { toast } from "sonner";
+import { formatDistanceToNow } from "date-fns";
 
 export default function StreamPage() {
   const params = useParams();
@@ -51,7 +52,7 @@ export default function StreamPage() {
 
   const handleEndStream = () => {
     api
-      .endStream(streamId)
+      .endStream(stream?.stream_key!)
       .then(() => {
         toast.success("Stream ended!");
         router.push("/browse");
@@ -115,8 +116,19 @@ export default function StreamPage() {
           {/* Main content */}
           <div className="lg:col-span-3 space-y-6">
             {/* Video player */}
-            <div className="aspect-video">
-              <VideoPlayer src={streamUrl} isLive={stream.is_live} poster={stream.thumbnail_url} className="w-full h-full" />
+            <div className="aspect-video flex items-center justify-center bg-card text-muted-foreground text-xl font-semibold">
+              {stream.actual_end && new Date(stream.actual_end).getTime() < Date.now() ? (
+                <div className="text-center">
+                  <p className="text-red-500 font-bold animate-pulse">Stream ended {formatDistanceToNow(new Date(stream.actual_end), { addSuffix: true })}</p>
+                </div>
+              ) : (
+                <VideoPlayer
+                  src={streamUrl}
+                  isLive={!stream.actual_end || new Date(stream.actual_end).getTime() > Date.now()}
+                  poster={stream.thumbnail_url}
+                  className="w-full h-full"
+                />
+              )}
             </div>
 
             {/* Stream info */}
@@ -130,7 +142,7 @@ export default function StreamPage() {
                         LIVE
                       </Badge>
                     )}
-                    {user && user.id === stream.user_id && (
+                    {user && user.id === stream.user_id && stream.is_live && (
                       <div>
                         <Button onClick={handleEndStream}>End stream</Button>
                       </div>
@@ -178,7 +190,7 @@ export default function StreamPage() {
           <div className="space-y-6">
             {/* Chat */}
             <div className="h-96 lg:h-[600px]">
-              <Chat streamId={streamId} className="h-full" />
+              <Chat stream={stream} className="h-full" />
             </div>
 
             {/* Related streams */}

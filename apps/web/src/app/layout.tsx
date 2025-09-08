@@ -6,7 +6,7 @@ import { Suspense } from "react";
 import "../styles/globals.css";
 
 export const metadata: Metadata = {
-  title: "StreamHub - Live Streaming Platform",
+  title: "TV1 Prime - Live Streaming Platform",
   description: "Professional live streaming platform for creators and viewers",
   generator: "v0.app",
 };

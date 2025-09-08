@@ -14,7 +14,7 @@ export function Header() {
     <header className="bg-card border-b border-border">
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
         <Link href="/" className="text-2xl font-bold text-primary">
-          StreamHub
+          TV1 PRIME
         </Link>
 
         <nav className="hidden md:flex items-center space-x-6">
