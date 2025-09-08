@@ -1,6 +1,6 @@
 FROM tiangolo/nginx-rtmp:latest
 
-# Install ffmpeg
+# Install ffmpeg on Debian
 RUN apt-get update && apt-get install -y ffmpeg && rm -rf /var/lib/apt/lists/*
 
 # Copy your custom nginx.conf

@@ -13,7 +13,9 @@ services:
     restart: unless-stopped
 
   api_service:
-    build: ./apps/api_server
+    build:
+      context: ./apps/api_server
+      dockerfile: Dockerfile
     container_name: api_server
     env_file:
       - ./apps/api_server/.env
@@ -24,7 +26,9 @@ services:
     restart: unless-stopped
 
   web_service:
-    build: ./apps/web
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
     container_name: web_server
     env_file:
       - ./apps/web/.env
@@ -36,7 +40,9 @@ services:
     restart: unless-stopped
 
   nginx_rtmp_service:
-    image: tiangolo/nginx-rtmp:latest
+    build:
+      context: ./apps/nginx_rtmp_server
+      dockerfile: Dockerfile
     container_name: nginx_rtmp_server
     ports:
       - "1935:1935"

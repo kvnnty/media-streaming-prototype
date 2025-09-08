@@ -1,11 +1,10 @@
-import { Response } from "express";
+import { Response, Request } from "express";
 import fs from "fs";
 import path from "path";
 import { AuthRequest } from "../middleware/auth";
 import pool from "../models/db";
 import { generateStreamKey } from "../utils/streamkey";
 import { buildMediaUrl } from "../utils/media";
-
 
 export class StreamController {
   // Helper to ensure uploads directories exist and return saved relative path
@@ -39,9 +38,6 @@ export class StreamController {
     return path.relative(process.cwd(), dest);
   }
 
-  // -------------------
-  // Create a stream (optional thumbnail upload)
-  // -------------------
   static async createStream(req: AuthRequest, res: Response) {
     try {
       const { title, description, scheduled_start } = req.body;
@@ -82,9 +78,6 @@ export class StreamController {
     }
   }
 
-  // -------------------
-  // Upload or replace stream thumbnail (separate endpoint)
-  // -------------------
   static async uploadStreamThumbnail(req: AuthRequest, res: Response) {
     try {
       const { id } = req.params;
@@ -132,9 +125,6 @@ export class StreamController {
     }
   }
 
-  // -------------------
-  // Get all streams (with stream_url and thumbnail_url)
-  // -------------------
   static async getStreams(req: AuthRequest, res: Response) {
     try {
       const result = await pool.query(`
@@ -157,9 +147,6 @@ export class StreamController {
     }
   }
 
-  // -------------------
-  // Get single stream
-  // -------------------
   static async getStream(req: AuthRequest, res: Response) {
     try {
       const { id } = req.params;
@@ -185,67 +172,46 @@ export class StreamController {
     }
   }
 
-  // -------------------
-  // Update stream live status (only owner)
-  // -------------------
-  static async updateStreamStatus(req: AuthRequest, res: Response) {
+  static async startStream(req: Request, res: Response) {
     try {
-      const { id } = req.params;
-      const { is_live } = req.body;
-      const userId = req.user?.id;
+      const { name : streamKey } = req.body;
+      console.log("Starting stream with key:", streamKey);
 
       const result = await pool.query(
-        `UPDATE streams SET is_live = $1, actual_start = $2
-         WHERE id = $3 AND user_id = $4
-         RETURNING *`,
-        [is_live, is_live ? new Date() : null, id, userId]
+        `UPDATE streams SET is_live = true, actual_start = $1
+       WHERE stream_key = $2 RETURNING *`,
+        [new Date(), streamKey]
       );
 
-      if (result.rows.length === 0) return res.status(404).json({ error: "Stream not found or unauthorized" });
+      if (result.rows.length === 0) return res.sendStatus(404);
 
-      const stream = result.rows[0];
-      res.json({
-        ...stream,
-        stream_url: buildMediaUrl(`/live/${stream.stream_key}`),
-        thumbnail_url: stream.thumbnail_url ? buildMediaUrl(stream.thumbnail_url) : null,
-      });
+      res.sendStatus(200);
     } catch (error) {
-      console.error("[StreamController] updateStreamStatus error:", error);
-      res.status(500).json({ error: "Internal server error" });
+      console.error("[StreamController] startStream error:", error);
+      res.sendStatus(500);
     }
   }
 
-  // -------------------
-  // End stream (owner)
-  // -------------------
-  static async endStream(req: AuthRequest, res: Response) {
+  static async endStream(req: Request, res: Response) {
     try {
-      const { id } = req.params;
-      const userId = req.user?.id;
+      const { name: streamKey } = req.body;
+      console.log("Ending stream with key:", streamKey);
 
       const result = await pool.query(
         `UPDATE streams SET is_live = false, actual_end = $1
-         WHERE id = $2 AND user_id = $3 RETURNING *`,
-        [new Date(), id, userId]
+       WHERE stream_key = $2 RETURNING *`,
+        [new Date(), streamKey]
       );
 
-      if (result.rows.length === 0) return res.status(404).json({ error: "Stream not found or unauthorized" });
+      if (result.rows.length === 0) return res.sendStatus(404);
 
-      const stream = result.rows[0];
-      res.json({
-        ...stream,
-        stream_url: buildMediaUrl(`/live/${stream.stream_key}`),
-        thumbnail_url: stream.thumbnail_url ? buildMediaUrl(stream.thumbnail_url) : null,
-      });
+      res.sendStatus(200);
     } catch (error) {
       console.error("[StreamController] endStream error:", error);
-      res.status(500).json({ error: "Internal server error" });
+      res.sendStatus(500);
     }
   }
 
-  // -------------------
-  // Get live streams
-  // -------------------
   static async getLiveStreams(req: AuthRequest, res: Response) {
     try {
       const result = await pool.query(

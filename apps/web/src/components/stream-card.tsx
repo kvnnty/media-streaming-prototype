@@ -29,7 +29,7 @@ export function StreamCard({ stream }: StreamCardProps) {
           )}
           <div className="absolute bottom-2 right-2 bg-black/70 text-white px-2 py-1 rounded text-xs flex items-center">
             <Users className="w-3 h-3 mr-1" />
-            {Math.floor(Math.random() * 1000) + 50}
+            {/* {Math.floor(Math.random() * 1000) + 50} */}
           </div>
         </div>
         <CardContent className="p-4">
