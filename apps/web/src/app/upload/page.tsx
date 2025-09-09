@@ -1,53 +1,53 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Header } from "@/components/header"
-import { FileUpload } from "@/components/file-upload"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { useAuth } from "@/hooks/use-auth"
-import { useToast } from "@/hooks/use-toast"
-import { api } from "@/lib/api"
-import { VideoIcon } from "lucide-react"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Header } from "@/components/header";
+import { VideoUpload } from "@/components/video-upload";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useAuth } from "@/hooks/use-auth";
+import { useToast } from "@/hooks/use-toast";
+import { api } from "@/lib/api";
+import { VideoIcon } from "lucide-react";
 
 export default function UploadPage() {
-  const [title, setTitle] = useState("")
-  const [description, setDescription] = useState("")
-  const [uploading, setUploading] = useState(false)
-  const { user } = useAuth()
-  const { toast } = useToast()
-  const router = useRouter()
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const router = useRouter();
 
   const handleUpload = async (file: File) => {
     if (!title.trim()) {
-      throw new Error("Please enter a title for your video")
+      throw new Error("Please enter a title for your video");
     }
 
-    setUploading(true)
+    setUploading(true);
 
     try {
-      const formData = new FormData()
-      formData.append("video", file)
-      formData.append("title", title.trim())
-      formData.append("description", description.trim())
+      const formData = new FormData();
+      formData.append("video", file);
+      formData.append("title", title.trim());
+      formData.append("description", description.trim());
 
-      const video = await api.uploadVideo(formData)
+      const video = await api.uploadVideo(formData);
 
       toast({
         title: "Upload successful!",
         description: "Your video has been uploaded and is being processed.",
-      })
+      });
 
-      router.push(`/video/${video.id}`)
+      router.push(`/video/${video.id}`);
     } catch (error) {
-      throw error
+      throw error;
     } finally {
-      setUploading(false)
+      setUploading(false);
     }
-  }
+  };
 
   if (!user) {
     return (
@@ -60,7 +60,7 @@ export default function UploadPage() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -84,14 +84,7 @@ export default function UploadPage() {
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="title">Title *</Label>
-                  <Input
-                    id="title"
-                    placeholder="Enter video title"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    maxLength={100}
-                    required
-                  />
+                  <Input id="title" placeholder="Enter video title" value={title} onChange={(e) => setTitle(e.target.value)} maxLength={100} required />
                   <p className="text-xs text-muted-foreground">{title.length}/100 characters</p>
                 </div>
 
@@ -111,7 +104,7 @@ export default function UploadPage() {
             </Card>
 
             {/* File upload */}
-            <FileUpload onUpload={handleUpload} />
+            <VideoUpload onUpload={handleUpload} />
 
             <div className="text-sm text-muted-foreground">
               <h4 className="font-medium mb-2">Upload Guidelines:</h4>
@@ -126,5 +119,5 @@ export default function UploadPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

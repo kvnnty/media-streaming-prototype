@@ -192,8 +192,8 @@ export function VideoPlayer({ src, isLive = false, poster, className = "" }: Vid
 
       {!isPlaying && (
         <div className="absolute inset-0 flex items-center justify-center">
-          <Button variant="ghost" size="lg" onClick={togglePlay} className="bg-black/50 text-white hover:bg-black/70 rounded-full p-4">
-            <Play className="w-8 h-8" />
+          <Button variant="ghost" size="lg" onClick={togglePlay} className="bg-black/50 text-white hover:bg-black/70 rounded-full w-16 h-16 grid place-content-center cursor-pointer">
+            <Play className="w-12 h-12" />
           </Button>
         </div>
       )}

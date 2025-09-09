@@ -12,7 +12,7 @@ class SocketManager {
       return this.socket
     }
 
-    const serverUrl = process.env.NEXT_PUBLIC_API_URL?.replace("/api", "") || "http://localhost:5000"
+    const serverUrl = process.env.NEXT_PUBLIC_API_URL?.replace("/api", "");
 
     this.socket = io(serverUrl, {
       auth: {

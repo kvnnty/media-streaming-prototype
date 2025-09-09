@@ -1,55 +1,55 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { useSearchParams } from "next/navigation"
-import { Header } from "@/components/header"
-import { StreamCard } from "@/components/stream-card"
-import { VideoCard } from "@/components/video-card"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useAuth } from "@/hooks/use-auth"
-import { api, type Stream, type Video } from "@/lib/api"
-import { Plus, VideoIcon, Zap, Eye, Calendar, Copy, ExternalLink } from "lucide-react"
-import Link from "next/link"
+import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { Header } from "@/components/header";
+import { StreamCard } from "@/components/stream-card";
+import { VideoCard } from "@/components/video-card";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAuth } from "@/hooks/use-auth";
+import { api, type Stream, type Video } from "@/lib/api";
+import { Plus, VideoIcon, Zap, Eye, Calendar, Copy, ExternalLink } from "lucide-react";
+import Link from "next/link";
 
 export default function DashboardPage() {
-  const [streams, setStreams] = useState<Stream[]>([])
-  const [videos, setVideos] = useState<Video[]>([])
-  const [loading, setLoading] = useState(true)
-  const { user } = useAuth()
-  const searchParams = useSearchParams()
-  const defaultTab = searchParams.get("tab") || "overview"
+  const [streams, setStreams] = useState<Stream[]>([]);
+  const [videos, setVideos] = useState<Video[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
+  const searchParams = useSearchParams();
+  const defaultTab = searchParams.get("tab") || "overview";
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!user) return
+      if (!user) return;
 
       try {
-        const [allStreams, allVideos] = await Promise.all([api.getStreams(), api.getVideos()])
+        const [allStreams, allVideos] = await Promise.all([api.getStreams(), api.getVideos()]);
 
         // Filter to show only user's content
-        setStreams(allStreams.filter((stream) => stream.username === user.username))
-        setVideos(allVideos.filter((video) => video.username === user.username))
+        setStreams(allStreams.filter((stream) => stream.username === user.username));
+        setVideos(allVideos.filter((video) => video.username === user.username));
       } catch (error) {
-        console.error("Failed to fetch dashboard data:", error)
+        console.error("Failed to fetch dashboard data:", error);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchData()
-  }, [user])
+    fetchData();
+  }, [user]);
 
   const copyStreamKey = (streamKey: string) => {
-    navigator.clipboard.writeText(streamKey)
-  }
+    navigator.clipboard.writeText(streamKey);
+  };
 
-  const liveStreams = streams.filter((stream) => stream.is_live)
-  const upcomingStreams = streams.filter((stream) => !stream.is_live && new Date(stream.scheduled_start) > new Date())
-  const pastStreams = streams.filter((stream) => !stream.is_live && new Date(stream.scheduled_start) <= new Date())
+  const liveStreams = streams.filter((stream) => stream.is_live);
+  const upcomingStreams = streams.filter((stream) => !stream.is_live && new Date(stream.actual_start!) > new Date());
+  const pastStreams = streams.filter((stream) => !stream.is_live && new Date(stream.actual_end!) <= new Date());
 
-  const totalViews = videos.reduce((sum, video) => sum + video.view_count, 0)
+  const totalViews = videos.reduce((sum, video) => sum + video.view_count, 0);
 
   if (!user) {
     return (
@@ -62,7 +62,7 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   if (loading) {
@@ -78,7 +78,7 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -201,14 +201,11 @@ export default function DashboardPage() {
                   {upcomingStreams.length > 0 ? (
                     <div className="space-y-4">
                       {upcomingStreams.slice(0, 3).map((stream) => (
-                        <div
-                          key={stream.id}
-                          className="flex items-center justify-between p-3 border border-border rounded-lg"
-                        >
+                        <div key={stream.id} className="flex items-center justify-between p-3 border border-border rounded-lg">
                           <div>
                             <h4 className="font-medium">{stream.title}</h4>
                             <p className="text-sm text-muted-foreground">
-                              {new Date(stream.scheduled_start).toLocaleString()}
+                              {stream.actual_start ? new Date(stream.actual_start).toLocaleString() : "Not started yet"}
                             </p>
                           </div>
                           <Button size="sm" variant="outline" asChild>
@@ -320,5 +317,5 @@ export default function DashboardPage() {
         </Tabs>
       </div>
     </div>
-  )
+  );
 }

@@ -8,6 +8,4 @@ RUN npm install -g pnpm && pnpm install --frozen-lockfile
 
 COPY . .
 
-RUN pnpm build
-
-CMD ["pnpm", "start"]
+CMD ["pnpm", "dev"]

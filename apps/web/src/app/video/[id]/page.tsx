@@ -1,57 +1,57 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { useParams } from "next/navigation"
-import { Header } from "@/components/header"
-import { VideoPlayer } from "@/components/video-player"
-import { VideoCard } from "@/components/video-card"
-import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { api, type Video } from "@/lib/api"
-import { useAuth } from "@/hooks/use-auth"
-import { Calendar, Eye, Share2, Flag, ThumbsUp, ThumbsDown } from "lucide-react"
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import { Header } from "@/components/header";
+import { VideoPlayer } from "@/components/video-player";
+import { VideoCard } from "@/components/video-card";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { api, type Video } from "@/lib/api";
+import { useAuth } from "@/hooks/use-auth";
+import { Calendar, Eye, Share2, Flag, ThumbsUp, ThumbsDown } from "lucide-react";
 
 export default function VideoPage() {
-  const params = useParams()
-  const videoId = params.id as string
-  const [video, setVideo] = useState<Video | null>(null)
-  const [relatedVideos, setRelatedVideos] = useState<Video[]>([])
-  const [loading, setLoading] = useState(true)
-  const [isLiked, setIsLiked] = useState(false)
-  const [isDisliked, setIsDisliked] = useState(false)
-  const { user } = useAuth()
+  const params = useParams();
+  const videoId = params.id as string;
+  const [video, setVideo] = useState<Video | null>(null);
+  const [relatedVideos, setRelatedVideos] = useState<Video[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isLiked, setIsLiked] = useState(false);
+  const [isDisliked, setIsDisliked] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [videoData, allVideos] = await Promise.all([api.getVideo(videoId), api.getVideos()])
+        const [videoData, allVideos] = await Promise.all([api.getVideo(videoId), api.getVideos()]);
 
-        setVideo(videoData)
+        setVideo(videoData);
         // Filter out current video and show related ones
-        setRelatedVideos(allVideos.filter((v) => v.id !== Number.parseInt(videoId)).slice(0, 6))
+        setRelatedVideos(allVideos.filter((v) => v.id !== Number.parseInt(videoId)).slice(0, 6));
       } catch (error) {
-        console.error("Failed to fetch video:", error)
+        console.error("Failed to fetch video:", error);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
     if (videoId) {
-      fetchData()
+      fetchData();
     }
-  }, [videoId])
+  }, [videoId]);
 
   const handleLike = () => {
-    setIsLiked(!isLiked)
-    if (isDisliked) setIsDisliked(false)
+    setIsLiked(!isLiked);
+    if (isDisliked) setIsDisliked(false);
     // TODO: Implement like API call
-  }
+  };
 
   const handleDislike = () => {
-    setIsDisliked(!isDisliked)
-    if (isLiked) setIsLiked(false)
+    setIsDisliked(!isDisliked);
+    if (isLiked) setIsLiked(false);
     // TODO: Implement dislike API call
-  }
+  };
 
   const handleShare = () => {
     if (navigator.share) {
@@ -59,11 +59,11 @@ export default function VideoPage() {
         title: video?.title,
         text: `Check out this video: ${video?.title}`,
         url: window.location.href,
-      })
+      });
     } else {
-      navigator.clipboard.writeText(window.location.href)
+      navigator.clipboard.writeText(window.location.href);
     }
-  }
+  };
 
   if (loading) {
     return (
@@ -78,7 +78,7 @@ export default function VideoPage() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   if (!video) {
@@ -92,11 +92,10 @@ export default function VideoPage() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
-  // Mock video stream URL - in production this would serve the actual video file
-  const videoUrl = `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/videos/${video.id}/stream`
+  const videoUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/videos/${video.id}/stream`;
 
   return (
     <div className="min-h-screen bg-background">
@@ -131,9 +130,7 @@ export default function VideoPage() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
                   <Avatar className="w-12 h-12">
-                    <AvatarFallback className="bg-primary text-primary-foreground">
-                      {video.username.charAt(0).toUpperCase()}
-                    </AvatarFallback>
+                    <AvatarFallback className="bg-primary text-primary-foreground">{video.username.charAt(0).toUpperCase()}</AvatarFallback>
                   </Avatar>
                   <div>
                     <h3 className="font-semibold">{video.username}</h3>
@@ -182,5 +179,5 @@ export default function VideoPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

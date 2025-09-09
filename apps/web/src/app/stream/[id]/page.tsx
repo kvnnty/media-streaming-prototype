@@ -1,19 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { Header } from "@/components/header";
-import { VideoPlayer } from "@/components/video-player";
 import { Chat } from "@/components/chat";
+import { Header } from "@/components/header";
 import { StreamCard } from "@/components/stream-card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { api, type Stream } from "@/lib/api";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { VideoPlayer } from "@/components/video-player";
 import { useAuth } from "@/hooks/use-auth";
-import { Calendar, Users, Heart, Share2, Flag } from "lucide-react";
-import { toast } from "sonner";
+import { api, type Stream } from "@/lib/api";
 import { formatDistanceToNow } from "date-fns";
+import { Calendar, Flag, Heart, Share2 } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export default function StreamPage() {
   const params = useParams();
@@ -105,7 +105,7 @@ export default function StreamPage() {
   }
 
   // Mock HLS stream URL - in production this would come from your streaming server
-  const streamUrl = stream.is_live ? `${process.env.NEXT_PUBLIC_RTMP_HTTP || "http://localhost:8083/hls"}/${stream.stream_key}.m3u8` : undefined;
+  const streamUrl = stream.is_live ? `${process.env.NEXT_PUBLIC_RTMP_HTTP}/hls/${stream.stream_key}.m3u8` : undefined;
 
   return (
     <div className="min-h-screen bg-background">
@@ -117,9 +117,13 @@ export default function StreamPage() {
           <div className="lg:col-span-3 space-y-6">
             {/* Video player */}
             <div className="aspect-video flex items-center justify-center bg-card text-muted-foreground text-xl font-semibold">
-              {stream.actual_end && new Date(stream.actual_end).getTime() < Date.now() ? (
+              {!stream.is_live && !stream.actual_start ? (
                 <div className="text-center">
-                  <p className="text-red-500 font-bold animate-pulse">Stream ended {formatDistanceToNow(new Date(stream.actual_end), { addSuffix: true })}</p>
+                  <p className="text-white">Stream has not started yet.</p>
+                </div>
+              ) : stream.actual_end && new Date(stream.actual_end).getTime() < Date.now() ? (
+                <div className="text-center">
+                  <p className="text-white font-bold animate-pulse">Stream ended {formatDistanceToNow(new Date(stream.actual_end), { addSuffix: true })}</p>
                 </div>
               ) : (
                 <VideoPlayer
@@ -163,7 +167,7 @@ export default function StreamPage() {
                     <h3 className="font-semibold">{stream.username}</h3>
                     <p className="text-sm text-muted-foreground flex items-center">
                       <Calendar className="w-4 h-4 mr-1" />
-                      Started {new Date(stream.actual_start || stream.scheduled_start).toLocaleString()}
+                      {stream.actual_start ? <>Started at {new Date(stream.actual_start).toLocaleString()}</> : "Not started yet"}
                     </p>
                   </div>
                 </div>

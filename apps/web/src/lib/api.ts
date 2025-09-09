@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+const API_BASE_URL = `${process.env.NEXT_PUBLIC_API_URL}/api`;
 
 export interface User {
   id: number;
@@ -19,7 +19,6 @@ export interface Stream {
   description: string;
   stream_key: string;
   is_live: boolean;
-  scheduled_start: string;
   actual_start?: string;
   actual_end?: string;
   thumbnail_url?: string;
@@ -102,10 +101,13 @@ class ApiClient {
     });
   }
 
-  async createStream(title: string, description: string, scheduledStart: string): Promise<Stream> {
+  async createStream(formData: FormData): Promise<Stream> {
+    const token = localStorage.getItem("auth_token");
+
     return this.request<Stream>("/streams", {
       method: "POST",
-      body: JSON.stringify({ title, description, scheduled_start: scheduledStart }),
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: formData,
     });
   }
 
