@@ -11,3 +11,4 @@ psql -h $PGHOST -p $PGPORT -U $PGUSER -d postgres -c "CREATE DATABASE $PGDATABAS
 psql -h $PGHOST -p $PGPORT -U $PGUSER -d $PGDATABASE -f ../src/models/schema.sql
 
 echo "Database setup complete."
+

@@ -1,10 +1,11 @@
 import { Router } from "express";
 import { StreamController } from "../controllers/stream.controller";
 import { requireAuth } from "../middleware/auth";
+import { uploadImage } from "../middleware/multer/image-upload";
 
 const router: Router = Router();
 
-router.post("/", requireAuth, StreamController.createStream);
+router.post("/", requireAuth, uploadImage.single("thumbnail"), StreamController.createStream);
 router.get("/", StreamController.getStreams);
 router.get("/live", StreamController.getLiveStreams);
 router.get("/:id", StreamController.getStream);

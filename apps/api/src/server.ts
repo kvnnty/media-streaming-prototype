@@ -1,14 +1,11 @@
-import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import { createServer } from "http";
-import { Server } from "socket.io";
-import path from "path";
+import express from "express";
 import fs from "fs";
+import { createServer } from "http";
+import path from "path";
+import { Server } from "socket.io";
 
-import authRoutes from "./routes/auth";
-import streamRoutes from "./routes/streams";
-import videoRoutes from "./routes/videos";
 import pool from "./models/db";
 import router from "./routes";
 
@@ -18,8 +15,7 @@ const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
-    methods: ["GET", "POST"],
+    origin: "*",
   },
 });
 

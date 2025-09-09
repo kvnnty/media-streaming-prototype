@@ -7,9 +7,7 @@ import { FFmpegUtils } from "../utils/ffmpeg";
 import { buildMediaUrl } from "../utils/media";
 
 export class VideoController {
-  // -------------------
-  // 1. Upload Video
-  // -------------------
+
   static async uploadVideo(req: AuthRequest, res: Response) {
     try {
       const { title, description } = req.body;
@@ -45,7 +43,7 @@ export class VideoController {
       fs.renameSync(file.path, videoPath);
 
       // Generate thumbnail
-      const thumbnailPath = path.join(thumbnailsDir, `${Date.now()}-thumb.jpg`);
+      const thumbnailPath = path.join(thumbnailsDir, `${Date.now()}-thumbnail.jpg`);
       try {
         await FFmpegUtils.generateThumbnail(videoPath, thumbnailPath);
       } catch (error) {
@@ -74,9 +72,6 @@ export class VideoController {
     }
   }
 
-  // -------------------
-  // 2. Get all videos
-  // -------------------
   static async getVideos(req: AuthRequest, res: Response) {
     try {
       const { search } = req.query;
@@ -109,9 +104,6 @@ export class VideoController {
     }
   }
 
-  // -------------------
-  // 3. Get single video
-  // -------------------
   static async getVideo(req: AuthRequest, res: Response) {
     try {
       const { id } = req.params;
@@ -141,9 +133,7 @@ export class VideoController {
     }
   }
 
-  // -------------------
-  // 4. Stream video (byte-range)
-  // -------------------
+
   static async streamVideo(req: AuthRequest, res: Response) {
     try {
       const { id } = req.params;
@@ -183,9 +173,7 @@ export class VideoController {
     }
   }
 
-  // -------------------
-  // 5. Get thumbnail
-  // -------------------
+
   static async getThumbnail(req: AuthRequest, res: Response) {
     try {
       const { id } = req.params;

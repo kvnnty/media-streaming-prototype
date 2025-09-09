@@ -13,7 +13,6 @@ export interface Stream {
   description: string;
   stream_key: string;
   is_live: boolean;
-  scheduled_start: Date;
   actual_start?: Date;
   actual_end?: Date;
   thumbnail_url?: string;

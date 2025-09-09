@@ -15,7 +15,6 @@ CREATE TABLE streams (
     description TEXT,
     stream_key VARCHAR(255) UNIQUE NOT NULL,
     is_live BOOLEAN DEFAULT FALSE,
-    scheduled_start TIMESTAMP NOT NULL,
     actual_start TIMESTAMP,
     actual_end TIMESTAMP,
     thumbnail_url VARCHAR(255),

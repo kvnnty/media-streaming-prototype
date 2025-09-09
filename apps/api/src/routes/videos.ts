@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { VideoController } from "../controllers/video.controller";
 import { requireAuth } from "../middleware/auth";
-import { uploadVideo } from "../middleware/upload";
+import { uploadVideo } from "../middleware/multer/video-upload";
 
 const router: Router = Router();
 

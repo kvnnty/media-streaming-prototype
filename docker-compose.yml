@@ -12,31 +12,39 @@ services:
       - pg_data:/var/lib/postgresql/data
     restart: unless-stopped
 
-  api_service:
+  backend:
     build:
-      context: ./apps/api_server
+      context: ./apps/api
       dockerfile: Dockerfile
-    container_name: api_server
+    container_name: api
     env_file:
-      - ./apps/api_server/.env
+      - ./apps/api/.env
     ports:
       - "5000:5000"
     depends_on:
       - db
+    volumes:
+      - ./apps/api:/usr/src/app
+      - /usr/src/app/node_modules
+    command: pnpm run dev
     restart: unless-stopped
 
-  web_service:
+  frontend:
     build:
       context: ./apps/web
       dockerfile: Dockerfile
-    container_name: web_server
+    container_name: web
     env_file:
       - ./apps/web/.env
     ports:
       - "3000:3000"
     depends_on:
-      - api_service
+      - backend
       - nginx_rtmp_service
+    volumes:
+      - ./apps/web:/usr/src/app
+      - /usr/src/app/node_modules
+    command: pnpm run dev  
     restart: unless-stopped
 
   nginx_rtmp_service:
