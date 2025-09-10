@@ -104,7 +104,6 @@ export default function StreamPage() {
     );
   }
 
-  // Mock HLS stream URL - in production this would come from your streaming server
   const streamUrl = stream.is_live ? `${process.env.NEXT_PUBLIC_RTMP_HTTP}/hls/${stream.stream_key}.m3u8` : undefined;
 
   return (

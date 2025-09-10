@@ -18,7 +18,7 @@ services:
       dockerfile: Dockerfile
     container_name: api
     env_file:
-      - ./apps/api/.env
+      - ./apps/api/.env.docker
     ports:
       - "5000:5000"
     depends_on:
@@ -35,7 +35,7 @@ services:
       dockerfile: Dockerfile
     container_name: web
     env_file:
-      - ./apps/web/.env
+      - ./apps/web/.env.docker
     ports:
       - "3000:3000"
     depends_on:
